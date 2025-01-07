@@ -25,7 +25,7 @@
 #include "esp_flash_encrypt.h"
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
-#include "esp_spi_flash.h"
+#include "spi_flash_mmap.h"
 #include "esp_vfs.h"
 
 #include "common/cs_dbg.h"

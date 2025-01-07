@@ -20,7 +20,8 @@
 #include "spiffs.h"
 #include "spiffs_nucleus.h"
 
-#include "esp_spi_flash.h"
+#include "esp_flash.h"
+#include "spi_flash_mmap.h"
 
 #include "mbedtls/aes.h"
 
@@ -60,10 +61,13 @@ mbedtls_aes_context s_aes_ctx_enc, s_aes_ctx_dec;
 bool esp32xx_fs_crypt_init(void) {
   uint8_t tmp[32];
   uint32_t addr = 0;
-  for (addr = 0; addr < spi_flash_get_chip_size(); addr += 32) {
+  uint32_t size_flash_chip;
+  esp_flash_init(NULL);
+  esp_flash_get_size(NULL, &size_flash_chip);
+  for (addr = 0; addr < size_flash_chip; addr += 32) {
     mgos_wdt_feed();
-    if (spi_flash_read(addr, tmp, sizeof(tmp)) != ESP_OK) {
-      LOG(LL_ERROR, ("SPI read error at 0x%x", addr));
+    if (esp_flash_read(NULL, tmp, addr, sizeof(tmp)) != ESP_OK) {
+      LOG(LL_ERROR, ("SPI read error at 0x%"PRIx32"", addr));
       return false;
     }
     int j;
@@ -72,8 +76,8 @@ bool esp32xx_fs_crypt_init(void) {
     }
     if (j < sizeof(tmp)) continue;
     /* Found a suitably empty location, now decrypt it. */
-    if (spi_flash_read_encrypted(addr, tmp, sizeof(tmp)) != ESP_OK) {
-      LOG(LL_ERROR, ("SPI encrypted read error at 0x%x", addr));
+    if (esp_flash_read_encrypted(NULL, addr, tmp, sizeof(tmp)) != ESP_OK) {
+      LOG(LL_ERROR, ("SPI encrypted read error at 0x%"PRIx32"", addr));
       return false;
     }
     /* Now in tmp we have 32 x 0xff processed with the flash encryption key. */
@@ -81,7 +85,7 @@ bool esp32xx_fs_crypt_init(void) {
     mbedtls_aes_setkey_enc(&s_aes_ctx_enc, tmp, 256);
     mbedtls_aes_init(&s_aes_ctx_dec);
     mbedtls_aes_setkey_dec(&s_aes_ctx_dec, tmp, 256);
-    LOG(LL_INFO, ("FS encryption key set up, seed @ 0x%x", addr));
+    LOG(LL_INFO, ("FS encryption key set up, seed @ 0x%"PRIx32"", addr));
     return true;
   }
   LOG(LL_ERROR, ("Could not a suitable seed area for FS encryption"));

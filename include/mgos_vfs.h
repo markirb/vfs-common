@@ -69,10 +69,10 @@ struct mgos_vfs_fs {
  */
 extern struct mgos_vfs_mmap_desc *mgos_vfs_mmap_descs;
 
-#define MMAP_DESC_FROM_ADDR(addr)                                 \
-  (&mgos_vfs_mmap_descs[(((uintptr_t)(addr)) >> MMAP_ADDR_BITS) & \
+#define MMAP_DESC_FROM_ADDR(addr)                                  \
+  (&mgos_vfs_mmap_descs[(((uintptr_t) (addr)) >> MMAP_ADDR_BITS) & \
                         MMAP_NUM_MASK])
-#define MMAP_ADDR_FROM_ADDR(addr) (((uintptr_t)(addr)) & MMAP_ADDR_MASK)
+#define MMAP_ADDR_FROM_ADDR(addr) (((uintptr_t) (addr)) & MMAP_ADDR_MASK)
 
 #define MMAP_BASE_FROM_DESC(desc)    \
   ((void *) ((uintptr_t) MMAP_BASE | \

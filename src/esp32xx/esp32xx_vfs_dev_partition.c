@@ -23,6 +23,7 @@
 #include <stdlib.h>
 
 #include "esp_partition.h"
+#include "spi_flash_mmap.h"
 
 #include "common/cs_dbg.h"
 

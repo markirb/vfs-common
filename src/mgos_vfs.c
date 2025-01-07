@@ -152,9 +152,10 @@ bool mgos_vfs_mount_dev(const char *path, struct mgos_vfs_dev *dev,
     } else
 #endif
 #ifdef MGOS_HAVE_VFS_FS_SPIFFS
-    if (mgos_vfs_fs_spiffs_probe(dev)) {
+        if (mgos_vfs_fs_spiffs_probe(dev)) {
       fs_type = MGOS_VFS_FS_TYPE_SPIFFS;
-      if (fs_opts == NULL) fs_opts = CS_STRINGIFY_MACRO(MGOS_ROOT_FS_OPTS_SPIFFS);
+      if (fs_opts == NULL)
+        fs_opts = CS_STRINGIFY_MACRO(MGOS_ROOT_FS_OPTS_SPIFFS);
     } else
 #endif
     {
